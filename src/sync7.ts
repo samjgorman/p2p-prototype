@@ -3,6 +3,7 @@
 https://gist.github.com/sid24rane/2b10b8f4b2f814bd0851d861d3515a10
 
 TODO:
+- debug the whole remotePort vs localPort thing.
 - test out that this thing even works.
 	- write out a test!
 - persist log to disk
@@ -21,21 +22,37 @@ import * as net from "net"
 const ports = [8001, 8002, 8003, 8004, 8005, 8006]
 
 export class Source {
-	private connections: ConnnectionManager
-	constructor(private port: number) {
-		this.connections = new ConnnectionManager({
+	private network: Network
+	constructor(private port: number, private remotePorts: Array<number>) {
+		this.network = new Network({
 			port,
-			ports,
+			remotePorts,
 			onMessage: this.handleMessage,
-			onConnect: () => null,
+			onConnect: this.handleConnect,
 		})
+	}
+
+	private debug(...args: Array<any>) {
+		console.log(`src:${this.port} |`, ...args)
+	}
+
+	start() {
+		this.debug("start")
+		this.network.start()
+	}
+
+	stop() {
+		this.debug("stop")
+		this.network.stop()
 	}
 
 	private log: Array<any> = []
 
 	handleMessage = (socket: net.Socket, msg) => {
 		if (msg.type === "sync") {
+			this.debug("sync <=", socket.remotePort)
 			if (msg.size < this.log.length) {
+				this.debug("update =>", socket.remotePort)
 				socket.write(
 					JSON.stringify({
 						type: "update",
@@ -47,28 +64,53 @@ export class Source {
 		}
 	}
 
+	handleConnect = (socket: net.Socket) => {
+		this.debug(
+			"connect",
+			socket.remoteAddress,
+			socket.remotePort,
+			socket.localAddress,
+			socket.localPort
+		)
+	}
+
 	write(item: string) {
+		this.debug("write")
 		const index = this.log.length
 		this.log.push(item)
-		this.connections.broadcast({ type: "update", index, values: [item] })
+		this.network.broadcast({ type: "update", index, values: [item] })
 	}
 }
 
 export class Sink {
 	log: Array<any> = []
 
-	private connections: ConnnectionManager
-	constructor(private port: number) {
-		this.connections = new ConnnectionManager({
+	private network: Network
+	constructor(private port: number, remotePorts: Array<number>) {
+		this.network = new Network({
 			port,
-			ports,
+			remotePorts,
 			onMessage: this.handleMessage,
 			onConnect: this.handleConnect,
 		})
 	}
 
+	private debug(...args: Array<any>) {
+		console.log(`snk:${this.port} |`, ...args)
+	}
+	start() {
+		this.debug("start")
+		this.network.start()
+	}
+
+	stop() {
+		this.debug("stop")
+		this.network.stop()
+	}
+
 	handleMessage = (socket: net.Socket, msg) => {
 		if (msg.type === "update") {
+			this.debug("update <=", socket.remotePort)
 			if (msg.index > this.log.length) {
 				// Out of sync.
 				this.sync(socket)
@@ -80,39 +122,65 @@ export class Sink {
 	}
 
 	handleConnect = (socket: net.Socket) => {
+		this.debug(
+			"connect",
+			socket.remoteAddress,
+			socket.remotePort,
+			socket.localAddress,
+			socket.localPort
+		)
 		this.sync(socket)
 	}
 
 	sync(socket: net.Socket) {
+		this.debug("sync =>", socket.remotePort)
 		socket.write(JSON.stringify({ type: "sync", size: this.log.length }))
 	}
 }
 
-export class ConnnectionManager {
+export class Network {
 	private port: number
-	private ports: Array<number>
+	private remotePorts: Array<number>
 	private onMessage: (socket: net.Socket, msg: any) => void
 	private onConnect: (socket: net.Socket) => void
 
+	private server: net.Server | undefined
+	private sockets = new Map<number, net.Socket>()
+
 	constructor(args: {
 		port: number
-		ports: Array<number>
+		remotePorts: Array<number>
 		onMessage: (socket: net.Socket, msg: any) => void
 		onConnect: (socket: net.Socket) => void
 	}) {
 		this.port = args.port
-		this.ports = args.ports
+		this.remotePorts = args.remotePorts
 		this.onMessage = args.onMessage
 		this.onConnect = args.onConnect
 	}
 
-	private sockets = new Map<number, net.Socket>()
+	start() {
+		this.startServer()
+		this.startClients()
+	}
+
+	stop() {
+		if (this.server) {
+			this.server.close()
+			this.server = undefined
+		}
+		for (const socket of Array.from(this.sockets.values())) {
+			socket.end()
+			this.sockets = new Map()
+		}
+	}
 
 	// Server to accept connections when others come online.
 	startServer() {
-		var server = net.createServer()
-		server.on("connection", socket => {
+		this.server = net.createServer()
+		this.server.on("connection", socket => {
 			const port = socket.remotePort!
+			console.log("remote port", this.port, socket.remotePort, socket.localPort)
 			if (this.sockets.has(port)) {
 				console.warn("Client connection already exists!")
 			}
@@ -129,12 +197,12 @@ export class ConnnectionManager {
 				this.sockets.delete(port)
 			})
 		})
-		server.listen(this.port)
+		this.server.listen(this.port)
 	}
 
 	// Clients to connect to sinks when coming online.
 	startClients() {
-		for (const port of this.ports) {
+		for (const port of this.remotePorts) {
 			var socket = new net.Socket()
 			socket.setEncoding("utf8")
 			socket.connect({ port })
@@ -161,3 +229,11 @@ export class ConnnectionManager {
 		}
 	}
 }
+
+const source = new Source(8001, [8002])
+source.start()
+const sink = new Sink(8002, [8001])
+sink.start()
+
+// source.write("hello")
+// console.log(sink.log)
