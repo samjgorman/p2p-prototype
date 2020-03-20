@@ -4,9 +4,28 @@
 	"description": "P2P sync prototype",
 	"keywords": [],
 	"author": "",
+	"scripts": {
+		"start": "ts-node src/sync.ts"
+	},
 	"license": "MIT",
 	"dependencies": {
-		"lodash": "^4.17.15"
+		"@hyperswarm/discovery": "^1.10.0",
+		"@types/blessed": "^0.1.17",
+		"@types/express": "^4.17.3",
+		"@types/fs-extra": "^8.1.0",
+		"@types/node": "^13.9.1",
+		"@types/react": "^16.9.23",
+		"@types/react-blessed": "^0.3.2",
+		"@types/simple-peer": "^9.6.0",
+		"blessed": "^0.1.81",
+		"body-parser": "^1.19.0",
+		"express": "^4.17.1",
+		"fs-extra": "^8.1.0",
+		"lodash": "^4.17.15",
+		"react": "^16.13.0",
+		"react-blessed": "^0.6.2",
+		"simple-peer": "^9.6.2",
+		"wrtc": "^0.4.4"
 	},
 	"devDependencies": {
 		"@types/lodash": "^4.14.149",
