@@ -19,7 +19,14 @@ Goal:
 
 import * as net from "net"
 
-const ports = [8001, 8002, 8003, 8004, 8005, 8006]
+const discovery = {
+	a: 8001,
+	b: 8002,
+	c: 8003,
+	d: 8004,
+	e: 8005,
+	f: 8006,
+}
 
 export class Source {
 	private network: Network
