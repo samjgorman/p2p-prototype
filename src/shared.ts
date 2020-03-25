@@ -6,7 +6,7 @@ export async function loadLog(fileName: string): Promise<Array<string>> {
 		fs.readFile(fileName, "utf8", (err, data) => resolve(data))
 	)
 	if (contents) {
-		const items = contents.split("\n")
+		const items = contents.split("\n").filter(Boolean)
 		return items
 	} else {
 		return []

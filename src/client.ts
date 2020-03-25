@@ -1,9 +1,16 @@
 import * as net from "net"
 import * as fs from "fs"
 import { loadLog, connect, serve } from "./shared"
+import { argv } from "yargs"
+
+const port = argv._[0]
+const remotePort = argv._[1]
+
+console.log("Client port:", port)
+console.log("Server port:", remotePort)
 
 const log: Array<string> = []
-const fileName = "8001.log"
+const fileName = port + ".log"
 
 function handleSocket(socket: net.Socket) {
 	socket.write(JSON.stringify({ size: log.length }))
@@ -37,9 +44,9 @@ async function main() {
 	}
 
 	// Become discoverable to servers.
-	const server = serve(8001, handleSocket)
+	const server = serve(port, handleSocket)
 	// Connect to known servers.
-	const broker = connect(8000, handleSocket)
+	const broker = connect(remotePort, handleSocket)
 }
 
 main()

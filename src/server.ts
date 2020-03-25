@@ -2,6 +2,13 @@ import * as readline from "readline"
 import * as fs from "fs"
 import * as net from "net"
 import { loadLog, connect, serve } from "./shared"
+import { argv } from "yargs"
+
+const port = argv._[0]
+const remotePorts = argv._.slice(1)
+
+console.log("Server port:", port)
+console.log("Client ports:", ...remotePorts)
 
 const rl = readline.createInterface({
 	input: process.stdin,
@@ -15,10 +22,11 @@ async function getItem() {
 }
 
 const log: Array<string> = []
-const fileName = "8000.log"
+const fileName = port + ".log"
 const clients = new Set<net.Socket>()
 
 function handleSocket(socket: net.Socket) {
+	clients.add(socket)
 	socket.on("data", data => {
 		const body = JSON.parse(data.toString("utf8"))
 		if (body.size < log.length) {
@@ -39,12 +47,17 @@ async function main() {
 	}
 
 	// Become discoverable to clients.
-	const server = serve(8000, handleSocket)
+	const server = serve(port, handleSocket)
 	// Connect to known clients.
-	const broker = connect(8001, handleSocket)
+	const brokers = remotePorts.map(remotePort =>
+		connect(remotePort, handleSocket)
+	)
 
 	while (true) {
 		const item = await getItem()
+		if (!item) {
+			continue
+		}
 		log.push(item)
 		await new Promise(resolve => fs.appendFile(fileName, item + "\n", resolve))
 		for (const client of clients) {
