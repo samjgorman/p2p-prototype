@@ -20,43 +20,27 @@ export function serverServe(args: {
 }) {
 	const { clients, log, port } = args
 	const server = net.createServer()
-	server.on("connection", client => {
-		clients.add(client)
-		client.on("data", data => {
-			const body = JSON.parse(data.toString("utf8"))
-			if (body.size < log.length) {
-				client.write(JSON.stringify({ values: log.slice(body.size) }))
-			} else {
-				client.write(JSON.stringify({ values: [] }))
-			}
-		})
-		client.on("close", () => {
-			clients.delete(client)
-		})
+	server.on("connection", socket => {
+		serverHandleSocket({ socket, log, clients })
 	})
 	server.listen(port)
 }
 
-export function serverConnect(args: {
+export async function serverConnect(args: {
 	log: Array<string>
 	remotePort: number
 	clients: Set<net.Socket>
 }) {
 	const { remotePort, log, clients } = args
-	try {
-		const socket = new net.Socket()
-		socket.connect(remotePort, "localhost", function() {
-			serverHandleSocket({
-				socket,
-				log,
-				clients,
-			})
-		})
-		socket.on("error", function() {
-			// ignore error.
-		})
-		clients.add(socket)
-	} catch (error) {}
+	const socket = await connect({ remotePort })
+	if (!socket) {
+		return
+	}
+	serverHandleSocket({
+		socket,
+		log,
+		clients,
+	})
 }
 
 function serverHandleSocket(args: {
@@ -65,7 +49,6 @@ function serverHandleSocket(args: {
 	clients: Set<net.Socket>
 }) {
 	const { socket, log, clients } = args
-	clients.add(socket)
 	socket.on("data", data => {
 		const body = JSON.parse(data.toString("utf8"))
 		if (body.size < log.length) {
@@ -115,22 +98,16 @@ export async function clientConnect(args: {
 	log: Array<string>
 	remotePort: number
 }) {
-	try {
-		const { fileName, log, remotePort } = args
-		const socket = new net.Socket()
-		socket.connect(remotePort, "localhost", function() {
-			clientHandleSocket({
-				socket,
-				fileName,
-				log,
-			})
-		})
-		socket.on("error", function() {
-			// Ignore error.
-		})
-	} catch (error) {
-		console.log("HERE")
+	const { fileName, log, remotePort } = args
+	const socket = await connect({ remotePort })
+	if (!socket) {
+		return
 	}
+	clientHandleSocket({
+		socket,
+		fileName,
+		log,
+	})
 }
 
 export async function clientServe(args: {
@@ -148,4 +125,16 @@ export async function clientServe(args: {
 		})
 	})
 	server.listen(port)
+}
+
+export async function connect(args: { remotePort: number }) {
+	return new Promise<net.Socket | undefined>(resolve => {
+		const socket = new net.Socket()
+		socket.connect(args.remotePort, "localhost", function() {
+			resolve(socket)
+		})
+		socket.on("error", function() {
+			resolve(undefined)
+		})
+	})
 }
