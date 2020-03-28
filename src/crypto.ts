@@ -63,7 +63,7 @@ export function decrypt(args: {
 		to: { secretKey },
 	} = args
 	const message = Buffer.alloc(ciphertext.length)
-	sodium.crypto_box_open_detached(
+	const verified = sodium.crypto_box_open_detached(
 		message,
 		ciphertext,
 		mac,
@@ -71,5 +71,8 @@ export function decrypt(args: {
 		publicKey,
 		secretKey
 	)
+	if (!verified) {
+		return
+	}
 	return message
 }
