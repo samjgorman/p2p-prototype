@@ -1,5 +1,13 @@
 // https://github.com/bcomnes/sodium-cli/blob/master/index.js
 // https://github.com/sodium-friends/sodium-native
+
+// https://sodium-friends.github.io/docs/docs/keyboxencryption
+// https://download.libsodium.org/doc/public-key_cryptography/authenticated_encryption
+
+// MAC is a signature
+// Nonce is a random thing
+// We can generate and reuse a shared key if we want (see documentation).
+
 import sodium from "sodium-native"
 
 export function createKeys() {
@@ -21,8 +29,6 @@ export function createKeys() {
 	}
 }
 
-// https://sodium-friends.github.io/docs/docs/keyboxencryption
-// https://download.libsodium.org/doc/public-key_cryptography/authenticated_encryption
 export function encrypt(args: {
 	message: Buffer
 	from: { secretKey: Buffer }
@@ -45,23 +51,34 @@ export function encrypt(args: {
 		publicKey,
 		secretKey
 	)
-	return { ciphertext, mac, nonce }
+
+	const result = Buffer.alloc(ciphertext.length + mac.length + nonce.length)
+	ciphertext.copy(result, 0)
+	mac.copy(result, ciphertext.length)
+	nonce.copy(result, ciphertext.length + mac.length)
+	return result
 }
 
 export function decrypt(args: {
-	ciphertext: Buffer
-	mac: Buffer
-	nonce: Buffer
+	encrypted: Buffer
 	from: { publicKey: Buffer }
 	to: { secretKey: Buffer }
 }) {
 	const {
-		ciphertext,
-		mac,
-		nonce,
+		encrypted,
 		from: { publicKey },
 		to: { secretKey },
 	} = args
+
+	const mac = Buffer.alloc(sodium.crypto_box_MACBYTES)
+	const nonce = Buffer.alloc(sodium.crypto_box_NONCEBYTES)
+	encrypted.copy(mac, 0, encrypted.length - nonce.length - mac.length)
+	encrypted.copy(nonce, 0, encrypted.length - nonce.length)
+	const ciphertext = encrypted.slice(
+		0,
+		encrypted.length - nonce.length - mac.length
+	)
+
 	const message = Buffer.alloc(ciphertext.length)
 	const verified = sodium.crypto_box_open_detached(
 		message,

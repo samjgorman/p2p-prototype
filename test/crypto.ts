@@ -12,7 +12,7 @@ ava("Encrypt/decrypt", t => {
 		to: b,
 	})
 	const decrypted = decrypt({
-		...encrypted,
+		encrypted,
 		from: a,
 		to: b,
 	})
