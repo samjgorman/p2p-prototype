@@ -39,10 +39,29 @@ export function encrypt(args: {
 		from: { secretKey },
 		to: { publicKey },
 	} = args
-	const ciphertext = Buffer.alloc(message.length)
-	const mac = Buffer.alloc(sodium.crypto_box_MACBYTES) // signature
-	const nonce = Buffer.alloc(sodium.crypto_box_NONCEBYTES)
+
+	// Alloc only a single buffer for the whole payload.
+	const payload = Buffer.alloc(
+		message.length + sodium.crypto_box_MACBYTES + sodium.crypto_box_NONCEBYTES
+	)
+
+	// Create a view of the payload for the ciphertext, mac, and nonce.
+	const ciphertext = Buffer.from(payload.buffer, 0, message.length)
+	const mac = Buffer.from(
+		payload.buffer,
+		message.length,
+		sodium.crypto_box_MACBYTES
+	)
+	const nonce = Buffer.from(
+		payload.buffer,
+		message.length + sodium.crypto_box_MACBYTES,
+		sodium.crypto_box_NONCEBYTES
+	)
+
+	// Create the nonce.
 	sodium.randombytes_buf(nonce)
+
+	// Encrypt
 	sodium.crypto_box_detached(
 		ciphertext,
 		mac,
@@ -51,35 +70,41 @@ export function encrypt(args: {
 		publicKey,
 		secretKey
 	)
-
-	const result = Buffer.alloc(ciphertext.length + mac.length + nonce.length)
-	ciphertext.copy(result, 0)
-	mac.copy(result, ciphertext.length)
-	nonce.copy(result, ciphertext.length + mac.length)
-	return result
+	return payload
 }
 
 export function decrypt(args: {
-	encrypted: Buffer
+	payload: Buffer
 	from: { publicKey: Buffer }
 	to: { secretKey: Buffer }
 }) {
 	const {
-		encrypted,
+		payload,
 		from: { publicKey },
 		to: { secretKey },
 	} = args
 
-	const mac = Buffer.alloc(sodium.crypto_box_MACBYTES)
-	const nonce = Buffer.alloc(sodium.crypto_box_NONCEBYTES)
-	encrypted.copy(mac, 0, encrypted.length - nonce.length - mac.length)
-	encrypted.copy(nonce, 0, encrypted.length - nonce.length)
-	const ciphertext = encrypted.slice(
+	// Create a view of the nonce, mac, and ciphertext inside the payload.
+	const nonce = Buffer.from(
+		payload.buffer,
+		payload.length - sodium.crypto_box_NONCEBYTES,
+		sodium.crypto_box_NONCEBYTES
+	)
+	const mac = Buffer.from(
+		payload.buffer,
+		payload.length - sodium.crypto_box_NONCEBYTES - sodium.crypto_box_MACBYTES,
+		sodium.crypto_box_MACBYTES
+	)
+	const ciphertext = Buffer.from(
+		payload.buffer,
 		0,
-		encrypted.length - nonce.length - mac.length
+		payload.length - sodium.crypto_box_NONCEBYTES - sodium.crypto_box_MACBYTES
 	)
 
+	// Alloc for the message
 	const message = Buffer.alloc(ciphertext.length)
+
+	// Decrypt and verify signature.
 	const verified = sodium.crypto_box_open_detached(
 		message,
 		ciphertext,

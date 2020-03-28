@@ -6,13 +6,13 @@ ava("Encrypt/decrypt", t => {
 	const b = createKeys()
 
 	const original = "hello world"
-	const encrypted = encrypt({
+	const payload = encrypt({
 		message: Buffer.from(original, "utf8"),
 		from: a,
 		to: b,
 	})
 	const decrypted = decrypt({
-		encrypted,
+		payload,
 		from: a,
 		to: b,
 	})
