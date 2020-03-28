@@ -16,3 +16,5 @@ UserA -> (Password + PKA) -> UserB (out of band)
 UserB -> HASH(PKA) -> PKA(PKB,SKB(Password))
 
 PKA({PKB, Password})
+
+https://security.stackexchange.com/questions/228893/can-ed25519-be-used-to-mitigate-mitm-attack-on-webrtc-with-an-untrusted-signalin

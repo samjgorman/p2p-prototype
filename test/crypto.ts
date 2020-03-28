@@ -1,20 +1,35 @@
 import ava from "ava"
-import { createKeys, encrypt, decrypt } from "../src/crypto"
+import { createKeys, box, boxOpen, seal, sealOpen } from "../src/crypto"
 
-ava("Encrypt/decrypt", t => {
+ava("box", t => {
 	const a = createKeys()
 	const b = createKeys()
 
 	const original = "hello world"
-	const payload = encrypt({
+	const payload = box({
 		message: Buffer.from(original, "utf8"),
 		from: a,
 		to: b,
 	})
-	const decrypted = decrypt({
+	const decrypted = boxOpen({
 		payload,
 		from: a,
 		to: b,
+	})
+	t.is(original, decrypted?.toString("utf8"))
+})
+
+ava("seal", t => {
+	const a = createKeys()
+
+	const original = "hello world"
+	const payload = seal({
+		message: Buffer.from(original, "utf8"),
+		to: a,
+	})
+	const decrypted = sealOpen({
+		payload,
+		to: a,
 	})
 	t.is(original, decrypted?.toString("utf8"))
 })
