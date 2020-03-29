@@ -1,5 +1,7 @@
 Build a basic chat app with Electron
-	https://whimsical.com/VPLPUCwCG9cwHuCkNyTQpo
+Follow the mocks here:  https://whimsical.com/VPLPUCwCG9cwHuCkNyTQpo
+
+
 
 - Is this strategy secure?
 	https://security.stackexchange.com/questions/228893/how-to-mitigate-mitm-attack-on-webrtc-with-an-untrusted-signaling-channel

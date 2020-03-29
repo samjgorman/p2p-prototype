@@ -4,6 +4,12 @@ const preloadApi = {
 	openExternalUrl(url: string) {
 		electron.shell.openExternal(url)
 	},
+	listIdentities(): Array<string> {
+		return []
+	},
+	createIdentity(name: string) {
+		return
+	},
 }
 
 export type PreloadApi = typeof preloadApi
