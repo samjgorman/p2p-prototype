@@ -1,5 +1,4 @@
 import { parse } from "url"
-import { pathToRegexp } from "path-to-regexp"
 
 type RootRoute = { type: "root" }
 type WelcomeRoute = { type: "welcome" }
@@ -9,18 +8,18 @@ type UnknownRoute = { type: "unknown"; url: string }
 export type Route = RootRoute | WelcomeRoute | ChatRoute | UnknownRoute
 
 export function parseRoute(url: string): Route {
-	const parsed = parse(url)
-	if (!parsed.pathname || parsed.pathname.endsWith("/index.html")) {
+	const parsed = parse(url, true)
+	if (!parsed.hash || parsed.hash === "#") {
 		return { type: "root" }
 	}
 
-	if (parsed.pathname === "/welcome") {
+	if (parsed.hash === "#welcome") {
 		return { type: "welcome" }
 	}
 
-	const chatResult = match(parsed.pathname, "/chat/:chatId")
-	if (chatResult) {
-		return { type: "chat", chatId: chatResult.chatId }
+	if (parsed.hash === "#chat") {
+		const chatId = parsed.query.charId as string
+		return { type: "chat", chatId }
 	}
 
 	return { type: "unknown", url }
@@ -29,29 +28,13 @@ export function parseRoute(url: string): Route {
 // TODO: we can test all these functions have proper inverses.
 export function formatRoute(route: Route) {
 	if (route.type === "root") {
-		return "/"
+		return "#"
 	}
 	if (route.type === "welcome") {
-		return "/welcome"
+		return "#welcome"
 	}
 	if (route.type === "chat") {
-		return "/chat/" + route.chatId
+		return "#chat?chatId=" + route.chatId
 	}
 	return route.url
-}
-
-function match(
-	pathname: string,
-	pattern: string
-): { [key: string]: string } | undefined {
-	const keys: any = []
-	const regex = pathToRegexp(pattern, keys)
-	const result = regex.exec(pathname)
-	if (!result) {
-		return
-	}
-	return keys.reduce((obj, key, index) => {
-		obj[key.name] = result[index + 1]
-		return obj
-	}, {})
 }
