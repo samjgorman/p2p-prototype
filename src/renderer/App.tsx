@@ -1,25 +1,25 @@
 import * as React from "react"
-import { api } from "./api"
+import { Router } from "./components/Router"
+import { Root } from "./components/Root"
+import { Welcome } from "./components/Welcome"
 
 export function App() {
-	const [{ x, y }, setMouse] = React.useState({ x: 0, y: 0 })
-	React.useEffect(() => {
-		const handleMouseMove = event => {
-			setMouse({ x: event.clientX, y: event.clientY })
-		}
-		window.addEventListener("mousemove", handleMouseMove)
-		return () => {
-			window.removeEventListener("mousemove", handleMouseMove)
-		}
-	})
-
 	return (
-		<div>
-			<h1>Hello World</h1>
-			<button onClick={() => api.openExternalUrl("https://www.chetcorcos.com")}>
-				Click Me!
-			</button>
-			<div style={{ width: x, height: y, background: "black" }} />
-		</div>
+		<Router>
+			{({ route, navigate }) => {
+				if (route.type === "root") {
+					return <Root navigate={navigate} />
+				}
+				if (route.type === "welcome") {
+					return <Welcome navigate={navigate} />
+				}
+				if (route.type === "chat") {
+					return <div>TBD</div>
+				}
+				if (route.type === "unknown") {
+					return <div>404</div>
+				}
+			}}
+		</Router>
 	)
 }

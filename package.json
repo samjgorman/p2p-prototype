@@ -5,20 +5,24 @@
 	"keywords": [],
 	"author": "",
 	"scripts": {
-    "build": "tsc && webpack -p",
-    "watch": "webpack -w",
-    "start": "tsc && electron build/main/main.js",
-		"test": "tsc && ava build/test/**/*.js -v"
+		"build": "tsc && webpack -p",
+		"watch": "webpack -w",
+		"start": "tsc -p tsconfig.main.json && electron build/main/main.js",
+		"test": "tsc -p tsconfig.test.json && ava build/test/**/*.js -v"
 	},
 	"license": "MIT",
 	"dependencies": {
 		"fs-extra": "^8.1.0",
 		"lodash": "^4.17.15",
+		"path-to-regexp": "^6.1.0",
 		"react": "^16.13.0",
 		"react-dom": "^16.13.1",
+		"reactive-magic": "^2.1.5",
 		"signalhub": "^4.9.0",
 		"simple-peer": "^9.6.2",
 		"sodium-native": "^3.0.0",
+		"url": "^0.11.0",
+		"uuid": "^7.0.2",
 		"wrtc": "^0.4.4"
 	},
 	"devDependencies": {

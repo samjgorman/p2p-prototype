@@ -3,7 +3,6 @@ import HtmlWebpackPlugin from "html-webpack-plugin"
 import { Configuration } from "webpack"
 
 const config: Configuration = {
-	target: "electron-renderer",
 	mode: "development",
 	entry: "./src/renderer/renderer.tsx",
 	resolve: {
