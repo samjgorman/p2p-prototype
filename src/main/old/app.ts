@@ -9,7 +9,7 @@ import {
 	seal,
 	sealOpen,
 	boxOpen,
-} from "./crypto"
+} from "../crypto"
 import inquirer from "inquirer"
 import signalhub from "signalhub"
 import Peer from "simple-peer"

@@ -1,5 +1,5 @@
 import ava from "ava"
-import { createKeys, box, boxOpen, seal, sealOpen } from "../src/crypto"
+import { createKeys, box, boxOpen, seal, sealOpen } from "../main/crypto"
 
 ava("box", t => {
 	const a = createKeys()

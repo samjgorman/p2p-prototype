@@ -1,9 +1,11 @@
 {
 	"compilerOptions": {
-		"target": "es2018",
+		"target": "es2017",
 		"module": "commonjs",
 		"jsx": "react",
 		"moduleResolution": "node",
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
 		"strictNullChecks": true,
 		"strictFunctionTypes": true,
 		"noImplicitThis": true,
@@ -11,14 +13,11 @@
 		"noUnusedLocals": false,
 		"noUnusedParameters": false,
 		"removeComments": true,
-		"esModuleInterop": true,
-		"allowSyntheticDefaultImports": true,
-		"downlevelIteration": true,
-		"allowJs": true,
 		"sourceMap": true,
+		"allowJs": true,
 		"outDir": "build",
-		"lib": ["es2015", "es2016", "es2017", "esnext.asynciterable", "dom"]
+		"lib": ["es2019", "esnext.asynciterable", "dom"]
 	},
-	"include": ["src/**/*", "test/**/*"],
-	"exclude": ["node_modules"]
+	"include": ["src/**/*"],
+	"exclude": ["node_modules", "src/renderer"]
 }
