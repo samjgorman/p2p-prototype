@@ -128,7 +128,7 @@ export function boxOpen(args: {
 		secretKey
 	)
 	if (!verified) {
-		return
+		throw new Error("Verification failed.")
 	}
 	return message
 }

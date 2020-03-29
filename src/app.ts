@@ -182,11 +182,6 @@ async function main() {
 							from: { publicKey },
 							to: me,
 						})
-
-						if (!data) {
-							console.log("Bad data?")
-							return
-						}
 						const result: PublicChannelMessagePayload = JSON.parse(
 							data.toString("utf8")
 						)

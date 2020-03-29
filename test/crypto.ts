@@ -16,7 +16,7 @@ ava("box", t => {
 		from: a,
 		to: b,
 	})
-	t.is(original, decrypted?.toString("utf8"))
+	t.is(original, decrypted.toString("utf8"))
 })
 
 ava("seal", t => {
