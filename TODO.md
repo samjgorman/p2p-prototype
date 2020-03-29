@@ -1,14 +1,8 @@
-- use signalhub + simple peer
-	- UserA sends {publicKeyA, password} unencrypted to UserB out of band.
-	- UserB discovers UserA via hash(publicKeyA)
-	- UserB sends seal({publicKeyB, password})
+Build a basic chat app with Electron
+	https://whimsical.com/VPLPUCwCG9cwHuCkNyTQpo
 
-sealOpen error?
-
-- consider using hyperswarm/network to announce and lookup peers
-
-
-https://security.stackexchange.com/questions/228893/how-to-mitigate-mitm-attack-on-webrtc-with-an-untrusted-signaling-channel
+- Is this strategy secure?
+	https://security.stackexchange.com/questions/228893/how-to-mitigate-mitm-attack-on-webrtc-with-an-untrusted-signaling-channel
 
 - Create a general abstraction for a "socket"
 	- Can we use simple-peer?
@@ -18,3 +12,5 @@ https://security.stackexchange.com/questions/228893/how-to-mitigate-mitm-attack-
 - Basic discovery mechanism with no auth
 - Queries / reducers (basically redux)
 - Auth -> P2P chat!
+
+- consider using hyperswarm/network to announce and lookup peers
