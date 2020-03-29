@@ -1,12 +1,10 @@
-- create Ed25519 keys with libsodium
-	- encrypt
-	- decrypt
-	- sign
-	- verify
-
 - use signalhub + simple peer
-	UserA -> (Password + PKA) -> UserB (out of band)
-	UserB -> HASH(PKA) -> PKA(PKB,SKB(Password))
+	- UserA sends {publicKeyA, password} unencrypted to UserB out of band.
+	- UserB discovers UserA via hash(publicKeyA)
+	- UserB sends seal({publicKeyB, password})
+
+sealOpen error?
+
 - consider using hyperswarm/network to announce and lookup peers
 
 

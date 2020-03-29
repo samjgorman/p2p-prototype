@@ -1,21 +1,13 @@
-# TypeScript Boilerplate
+# P2P Sync Prototype
 
-This is a simple setup for getting started building a web application using TypeScript, React, Redux, ImmutableJS, and Glamor.
+**Goal:** Create a simple and secure P2P sync prototype.
 
-## Getting Started
+- Using `libsodium` for creating key-pairs for identity and encryption.
+- Using `simple-peer` for WebRTC.
+- Using `signalhub` as a public discovery channel for WebRTC.
+	- Consider using mDNS, BLE, WiFi Direct, and DHT.
+	- Consider using `@hyperswarm/discovery`.
+	- Consider using `libp2p`.
 
-```sh
-git clone git@github.com:ccorcos/typescript-boilerplate.git project
-cd project
-git remote remove origin
-npm install
-npm start
-```
+WebRTC says it can set up a secure channel, but is vulnerable to MITM if the discovery channel is insecure. I'm assuming that encrypting the signaling packets should solve that issue.
 
-An in order to be able to deploy this using Github pages, you'll need to create an push an initial branch to Github:
-
-```sh
-git checkout -b gh-pages
-git push origin gh-pages
-git checkout master
-```

@@ -24,6 +24,7 @@ https://download.libsodium.org/doc/public-key_cryptography/sealed_boxes
 
 */
 import sodium from "sodium-native"
+import * as crypto from "crypto"
 
 export function createKeys() {
 	const publicKey = sodium.sodium_malloc(sodium.crypto_box_PUBLICKEYBYTES)
@@ -40,6 +41,10 @@ export function createKeys() {
 			sodium.sodium_memzero(secretKey)
 		},
 	}
+}
+
+function bufferView(buf: Buffer, start: number, length: number) {
+	return Buffer.from(buf.buffer, buf.byteOffset + start, length)
 }
 
 export function box(args: {
@@ -59,14 +64,10 @@ export function box(args: {
 	)
 
 	// Create a view of the payload for the ciphertext, mac, and nonce.
-	const ciphertext = Buffer.from(payload.buffer, 0, message.length)
-	const mac = Buffer.from(
-		payload.buffer,
-		message.length,
-		sodium.crypto_box_MACBYTES
-	)
-	const nonce = Buffer.from(
-		payload.buffer,
+	const ciphertext = bufferView(payload, 0, message.length)
+	const mac = bufferView(payload, message.length, sodium.crypto_box_MACBYTES)
+	const nonce = bufferView(
+		payload,
 		message.length + sodium.crypto_box_MACBYTES,
 		sodium.crypto_box_NONCEBYTES
 	)
@@ -98,18 +99,18 @@ export function boxOpen(args: {
 	} = args
 
 	// Create a view of the nonce, mac, and ciphertext inside the payload.
-	const nonce = Buffer.from(
-		payload.buffer,
+	const nonce = bufferView(
+		payload,
 		payload.length - sodium.crypto_box_NONCEBYTES,
 		sodium.crypto_box_NONCEBYTES
 	)
-	const mac = Buffer.from(
-		payload.buffer,
+	const mac = bufferView(
+		payload,
 		payload.length - sodium.crypto_box_NONCEBYTES - sodium.crypto_box_MACBYTES,
 		sodium.crypto_box_MACBYTES
 	)
-	const ciphertext = Buffer.from(
-		payload.buffer,
+	const ciphertext = bufferView(
+		payload,
 		0,
 		payload.length - sodium.crypto_box_NONCEBYTES - sodium.crypto_box_MACBYTES
 	)
@@ -161,4 +162,18 @@ export function sealOpen(args: {
 	// Decrypt
 	sodium.crypto_box_seal_open(message, payload, publicKey, secretKey)
 	return message
+}
+
+// TODO: consider a more secure hashing function to keep public keys anonymous.
+export function createHash(message: Buffer | string) {
+	return crypto
+		.createHash("sha256")
+		.update(message)
+		.digest()
+}
+
+export function randomBytes(bytes: number) {
+	const buf = Buffer.alloc(bytes)
+	sodium.randombytes_buf(buf)
+	return buf
 }
