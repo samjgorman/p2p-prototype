@@ -16,3 +16,11 @@ Follow the mocks here:  https://whimsical.com/VPLPUCwCG9cwHuCkNyTQpo
 - Auth -> P2P chat!
 
 - consider using hyperswarm/network to announce and lookup peers
+
+
+
+ideas:
+- event log is synced.
+- consume event log to build indexes.
+- chat window html is an index
+
