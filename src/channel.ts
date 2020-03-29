@@ -1,11 +1,5 @@
-import signalhub from "signalhub"
 import Peer from "simple-peer"
 import wrtc from "wrtc"
-
-const hub = signalhub("my-app-name", [
-	"https://signalhub-jccqtwhdwc.now.sh",
-	"https://signalhub-hzbibrznqa.now.sh",
-])
 
 // Two peers initiating at the same time.
 var peer1 = new Peer({ initiator: true, wrtc: wrtc })
@@ -28,7 +22,7 @@ peer1.on("connect", function() {
 
 peer2.on("connect", function() {
 	console.log("peer2 connect")
-	peer1.send("peer2->peer1")
+	peer2.send("peer2->peer1")
 })
 
 peer1.on("data", function(data) {
