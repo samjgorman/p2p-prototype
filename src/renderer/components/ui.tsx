@@ -3,18 +3,24 @@ import * as React from "react"
 interface VStackProps extends BoxProps {
 	align?: "center" | "left" | "right"
 	gap?: number | string
-	children?: Array<React.ReactNode>
+	children?: React.ReactNode
 }
 export function VStack(props: VStackProps) {
 	let children = props.children
-	if (props.gap && props.children && props.children.length > 1) {
-		children = []
+	if (
+		props.gap &&
+		props.children &&
+		Array.isArray(props.children) &&
+		props.children.length > 1
+	) {
+		const array: Array<React.ReactNode> = []
 		for (let i = 0; i < props.children.length; i++) {
 			const child = props.children[i]
-			children.push(child)
-			children.push(<Box key={-i} height={props.gap} />)
+			array.push(child)
+			array.push(<Box key={-i} height={props.gap} />)
 		}
-		children.pop()
+		array.pop()
+		children = array
 	}
 	return (
 		<Box
@@ -32,18 +38,24 @@ export function VStack(props: VStackProps) {
 interface HStackProps extends BoxProps {
 	// align?: "center" | "left" | "right"
 	gap?: number | string
-	children?: Array<React.ReactNode>
+	children?: React.ReactNode
 }
 export function HStack(props: HStackProps) {
 	let children = props.children
-	if (props.gap && props.children) {
-		children = []
+	if (
+		props.gap &&
+		props.children &&
+		Array.isArray(props.children) &&
+		props.children.length > 1
+	) {
+		const array: Array<React.ReactNode> = []
 		for (let i = 0; i < props.children.length; i++) {
 			const child = props.children[i]
-			children.push(child)
-			children.push(<Box key={i + "-spacer"} width={props.gap} />)
+			array.push(child)
+			array.push(<Box key={i + "-spacer"} width={props.gap} />)
 		}
-		children.pop()
+		array.pop()
+		children = array
 	}
 	return (
 		<Box
@@ -164,7 +176,10 @@ export function Select(props: SelectProps) {
 	)
 }
 
-export function Page({ children }) {
+interface PageProps {
+	children?: React.ReactNode
+}
+export function Page({ children }: PageProps) {
 	return (
 		<VStack align="center">
 			<Box height={100} />
@@ -218,16 +233,25 @@ export function ImportIdentity() {
 	)
 }
 
-export function SidebarItem({ selected, children }) {
+interface SidebarItemProps {
+	selected?: boolean
+	children?: React.ReactNode
+}
+export function SidebarItem({ selected, children }: SidebarItemProps) {
 	return <Button>{children}</Button>
 }
 
-export function Sidebar({ friends, me, identities }) {
+interface SidebarProps {
+	me: string
+	identities: Array<string>
+	friends: Array<string>
+}
+export function Sidebar({ friends, me, identities }: SidebarProps) {
 	return (
 		<VStack gap={8} width={300}>
-			<Select label="Identities" value={me.name} options={identities} />
+			<Select label="Identities" value={me} options={identities} />
 			{friends.map(friend => (
-				<SidebarItem selected={false}>{friend.name}</SidebarItem>
+				<SidebarItem selected={false}>{friend}</SidebarItem>
 			))}
 			<Box stretch={true} />
 			<Button>Add Friend</Button>
@@ -235,7 +259,15 @@ export function Sidebar({ friends, me, identities }) {
 	)
 }
 
-export function ChatLayout({ me, friends, children, identities }) {
+interface ChatLayoutProps extends SidebarProps {
+	children?: React.ReactNode
+}
+export function ChatLayout({
+	me,
+	friends,
+	children,
+	identities,
+}: ChatLayoutProps) {
 	return (
 		<HStack>
 			<Sidebar me={me} friends={friends} identities={identities} />
@@ -264,7 +296,10 @@ export function AddFriendForm() {
 	)
 }
 
-export function Modal({ children }) {
+interface ModalProps {
+	children?: React.ReactNode
+}
+export function Modal({ children }: ModalProps) {
 	return (
 		<div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0 }}>
 			{children}
@@ -272,7 +307,11 @@ export function Modal({ children }) {
 	)
 }
 
-export function ModalMenu({ width, children }) {
+interface ModalMenuProps {
+	width?: string | number
+	children?: React.ReactNode
+}
+export function ModalMenu({ width, children }: ModalMenuProps) {
 	return (
 		<Modal>
 			<VStack align="center">
@@ -293,29 +332,48 @@ export function AddFriendMenu() {
 	)
 }
 
-export function PendingInviteForm({ friend }) {
+interface PendingInviteFormProps {
+	friend: string
+}
+export function PendingInviteForm({ friend }: PendingInviteFormProps) {
 	return (
 		<VStack gap={30} align="center">
 			<Box height={300} />
-			<Input label={`Send ${friend.name} your invite code:`} />
+			<Input label={`Send ${friend} your invite code:`} />
 			<Box>Or</Box>
-			<Input label={`Paste ${friend.name}'s invite code:`} />
+			<Input label={`Paste ${friend}'s invite code:`} />
 		</VStack>
 	)
 }
 
-export function Topbar() {
-	return <Box />
+interface TopbarProps {
+	friend: string
+}
+export function Topbar({ friend }: TopbarProps) {
+	return <Box>{friend}</Box>
 }
 
-export function Message({ message }) {
-	return <Box>{message}</Box>
+interface Message {
+	from: string
+	message: string
+	createdAt: number
+	receivedAt: number
+}
+interface MessageProps {
+	message: Message
+}
+export function Message({ message }: MessageProps) {
+	return <Box>{message.message}</Box>
 }
 
-export function Chatroom({ friend, messages }) {
+interface ChatroomProps {
+	friend: string
+	messages: Array<Message>
+}
+export function Chatroom({ friend, messages }: ChatroomProps) {
 	return (
 		<VStack gap={30} align="center">
-			<Topbar />
+			<Topbar friend={friend} />
 			<Box stretch scroll>
 				{messages.map(message => (
 					<Message message={message} />

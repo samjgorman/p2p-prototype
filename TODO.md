@@ -2,6 +2,13 @@ Build a basic chat app with Electron
 Follow the mocks here:  https://whimsical.com/VPLPUCwCG9cwHuCkNyTQpo
 
 
+- keep mocking out https://whimsical.com/VPLPUCwCG9cwHuCkNyTQpo
+- create UI doc route
+	- use file menu to navigate between them
+- proper form elements?
+- click handlers to navigate between views
+- persist data to disk from selecton.
+
 
 - Is this strategy secure?
 	https://security.stackexchange.com/questions/228893/how-to-mitigate-mitm-attack-on-webrtc-with-an-untrusted-signaling-channel
