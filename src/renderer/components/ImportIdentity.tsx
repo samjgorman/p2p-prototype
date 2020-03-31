@@ -22,6 +22,7 @@ export class ImportIdentity extends React.PureComponent<
 				<VStack width="25em" gap={14}>
 					<Heading>Import Identity</Heading>
 					<Input
+						autoFocus={true}
 						value={this.state.name}
 						onChange={this.handleChangeName}
 						label="Name"

@@ -20,8 +20,10 @@ export class NewIdentity extends React.PureComponent<
 			<Page>
 				<Heading>New Identity</Heading>
 				<Input
+					autoFocus={true}
 					value={this.state.name}
 					onChange={this.handleChangeName}
+					onEnter={this.handleSubmit}
 					label="Name"
 					width="25em"
 				/>

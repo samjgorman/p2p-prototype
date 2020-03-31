@@ -7,14 +7,19 @@ import { ChatApp } from "./ChatApp"
 interface PlaygroundProps {}
 
 interface PlaygroundState {
-	page: "Welcome" | "NewIdentity" | "ImportIdentity" | "ChatApp"
+	page:
+		| "Welcome"
+		| "NewIdentity"
+		| "ImportIdentity"
+		| "ChatAppFresh"
+		| "ChatAppConnect"
 }
 
 export class Design extends React.PureComponent<
 	PlaygroundProps,
 	PlaygroundState
 > {
-	state: PlaygroundState = { page: "ChatApp" }
+	state: PlaygroundState = { page: "ChatAppConnect" }
 
 	render() {
 		if (this.state.page === "Welcome") {
@@ -38,8 +43,16 @@ export class Design extends React.PureComponent<
 					onSubmit={() => this.setState({ page: "Welcome" })}
 				/>
 			)
-		} else if (this.state.page === "ChatApp") {
+		} else if (this.state.page === "ChatAppFresh") {
 			return <ChatApp me="Chet" friends={[]} identities={["Chet"]} />
+		} else if (this.state.page === "ChatAppConnect") {
+			return (
+				<ChatApp
+					me="Chet"
+					friends={[{ name: "Meghan" }]}
+					identities={["Chet", "Work"]}
+				/>
+			)
 		}
 	}
 }

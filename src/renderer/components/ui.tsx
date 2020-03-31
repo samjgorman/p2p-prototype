@@ -92,8 +92,13 @@ interface BoxProps {
 	marginLeft?: string | number
 	marginRight?: string | number
 
-	stretch?: boolean
 	border?: boolean
+	borderLeft?: boolean
+	borderRight?: boolean
+	borderTop?: boolean
+	borderBottom?: boolean
+
+	stretch?: boolean
 	scroll?: boolean
 	style?: React.CSSProperties
 	children?: React.ReactNode
@@ -122,6 +127,10 @@ export function Box(props: BoxProps) {
 				margin: props.margin,
 				flex: props.stretch ? 1 : undefined,
 				border: props.border ? "1px solid black" : undefined,
+				borderLeft: props.borderLeft ? "1px solid black" : undefined,
+				borderRight: props.borderRight ? "1px solid black" : undefined,
+				borderTop: props.borderTop ? "1px solid black" : undefined,
+				borderBottom: props.borderBottom ? "1px solid black" : undefined,
 				overflow: props.scroll ? "auto" : undefined,
 				...props.style,
 			})}
@@ -141,10 +150,11 @@ function removeUndefinedValues(obj: object) {
 }
 
 interface HeadingProps {
+	style?: React.CSSProperties
 	children: React.ReactNode
 }
 export function Heading(props: HeadingProps) {
-	return <h1>{props.children}</h1>
+	return <h1 style={props.style}>{props.children}</h1>
 }
 
 interface ButtonProps {
@@ -169,16 +179,33 @@ export function PlainButton(props: PlainButtonProps) {
 
 interface InputProps extends BoxProps {
 	label: React.ReactNode
+	autoFocus?: boolean
 	value?: string
 	onChange?: React.ChangeEventHandler<HTMLInputElement>
+	onEnter?: () => void
 }
-export function Input(props: InputProps) {
-	return (
-		<VStack {...props} element="label">
-			<Box>{props.label}</Box>
-			<input value={props.value} onChange={props.onChange} />
-		</VStack>
-	)
+export class Input extends React.PureComponent<InputProps> {
+	render() {
+		return (
+			<VStack {...this.props} element="label">
+				<Box>{this.props.label}</Box>
+				<input
+					autoFocus={this.props.autoFocus}
+					value={this.props.value}
+					onChange={this.props.onChange}
+					onKeyPress={this.handleKeyPress}
+				/>
+			</VStack>
+		)
+	}
+
+	private handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === "Enter") {
+			if (this.props.onEnter) {
+				this.props.onEnter()
+			}
+		}
+	}
 }
 
 interface UploadProps extends BoxProps {
@@ -252,51 +279,6 @@ interface SidebarItemProps {
 }
 export function SidebarItem({ selected, children }: SidebarItemProps) {
 	return <Button>{children}</Button>
-}
-
-export function AddFriendForm() {
-	return (
-		<VStack>
-			<Heading>Add Friend</Heading>
-			<Input label="What's your friend's name?" />
-			<FormActions />
-		</VStack>
-	)
-}
-
-interface ModalProps {
-	children?: React.ReactNode
-}
-export function Modal({ children }: ModalProps) {
-	return (
-		<div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0 }}>
-			{children}
-		</div>
-	)
-}
-
-interface ModalMenuProps {
-	width?: string | number
-	children?: React.ReactNode
-}
-export function ModalMenu({ width, children }: ModalMenuProps) {
-	return (
-		<Modal>
-			<VStack align="center" paddingTop={250}>
-				<Box width={width} border={true}>
-					{children}
-				</Box>
-			</VStack>
-		</Modal>
-	)
-}
-
-export function AddFriendMenu() {
-	return (
-		<ModalMenu width={400}>
-			<AddFriendForm />
-		</ModalMenu>
-	)
 }
 
 interface PendingInviteFormProps {
