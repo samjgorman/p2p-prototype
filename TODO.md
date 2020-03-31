@@ -3,11 +3,12 @@ Follow the mocks here:  https://whimsical.com/VPLPUCwCG9cwHuCkNyTQpo
 
 
 - keep mocking out https://whimsical.com/VPLPUCwCG9cwHuCkNyTQpo
-- create UI doc route
+- create design route
 	- use file menu to navigate between them
 - proper form elements?
 - click handlers to navigate between views
-- persist data to disk from selecton.
+- wire up the actual application
+- abstraction for persisting data to disk.
 
 
 - Is this strategy secure?

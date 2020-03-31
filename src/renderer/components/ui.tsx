@@ -74,6 +74,10 @@ interface BoxProps {
 	element?: "div" | "label"
 	height?: string | number
 	width?: string | number
+	maxHeight?: string | number
+	maxWidth?: string | number
+	minHeight?: string | number
+	minWidth?: string | number
 	stretch?: boolean
 	border?: boolean
 	scroll?: boolean
@@ -87,6 +91,10 @@ export function Box(props: BoxProps) {
 			style={{
 				height: props.height,
 				width: props.width,
+				maxHeight: props.maxHeight,
+				maxWidth: props.maxWidth,
+				minHeight: props.minHeight,
+				minWidth: props.minWidth,
 				flex: props.stretch ? 1 : undefined,
 				border: props.border ? "1px solid black" : undefined,
 				overflow: props.scroll ? "auto" : undefined,
@@ -183,41 +191,86 @@ export function Page({ children }: PageProps) {
 	return (
 		<VStack align="center">
 			<Box height={100} />
-			<VStack width={600} gap={8}>
-				{children}
-			</VStack>
+			<Box maxWidth={600}>
+				<HStack>
+					<Box width={12} />
+					<VStack gap={8} stretch>
+						{children}
+					</VStack>
+					<Box width={12} />
+				</HStack>
+			</Box>
 			<Box height={100} />
 		</VStack>
 	)
 }
 
-export function Welcome() {
+export function Welcome(props: {
+	onNewIdentity?: () => void
+	onImportIdentity?: () => void
+}) {
 	return (
 		<Page>
 			<Heading>Welcome to P2P Chat</Heading>
-			<Button>Create a new identity</Button>
-			<Button>Import identity</Button>
+			<Button onClick={props.onNewIdentity}>Create a new identity</Button>
+			<Button onClick={props.onImportIdentity}>Import identity</Button>
 		</Page>
 	)
 }
 
-export function FormActions() {
+interface FormActionsProps {
+	onSubmit?: () => void
+	onCancel?: () => void
+}
+export function FormActions(props: FormActionsProps) {
 	return (
 		<HStack gap={8}>
-			<Button>Submit</Button>
-			<PlainButton>Cancel</PlainButton>
+			<Button onClick={props.onSubmit}>Submit</Button>
+			<PlainButton onClick={props.onCancel}>Cancel</PlainButton>
 		</HStack>
 	)
 }
 
-export function NewIdentity() {
-	return (
-		<Page>
-			<Heading>New Identity</Heading>
-			<Input label="Name" width="25em" />
-			<FormActions />
-		</Page>
-	)
+interface NewIdentityProps {
+	onCancel?: () => void
+	onSubmit?: (name: string) => void
+}
+interface NewIdentityState {
+	name: string
+}
+export class NewIdentity extends React.PureComponent<
+	NewIdentityProps,
+	NewIdentityState
+> {
+	state: NewIdentityState = { name: "" }
+
+	render() {
+		return (
+			<Page>
+				<Heading>New Identity</Heading>
+				<Input
+					value={this.state.name}
+					onChange={this.handleChangeName}
+					label="Name"
+					width="25em"
+				/>
+				<FormActions
+					onCancel={this.props.onCancel}
+					onSubmit={this.handleSubmit}
+				/>
+			</Page>
+		)
+	}
+
+	private handleChangeName = (e: React.ChangeEvent<HTMLInputElement>) => {
+		this.setState({ name: e.currentTarget.value })
+	}
+
+	private handleSubmit = () => {
+		if (this.props.onSubmit) {
+			this.props.onSubmit(this.state.name)
+		}
+	}
 }
 
 export function ImportIdentity() {
