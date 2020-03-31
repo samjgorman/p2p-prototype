@@ -15,10 +15,10 @@ export class ChatApp extends React.PureComponent<ChatAppProps, ChatAppState> {
 	state: ChatAppState = { showAddFriendModal: false }
 
 	render() {
-		const { me, friends, identities } = this.props
+		const { friends } = this.props
 		return (
 			<HStack>
-				<Sidebar me={me} friends={friends} identities={identities} />
+				<Sidebar friendId={this.props.friendId} friends={friends} />
 				<Box stretch={true} style={{ position: "relative" }}>
 					{this.renderContent()}
 					{this.renderAddFriendModal()}

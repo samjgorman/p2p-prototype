@@ -98,6 +98,8 @@ interface BoxProps {
 	borderTop?: boolean
 	borderBottom?: boolean
 
+	color?: "error" | "warning" | "normal"
+
 	stretch?: boolean
 	scroll?: boolean
 	style?: React.CSSProperties
@@ -125,6 +127,12 @@ export function Box(props: BoxProps) {
 				marginLeft: props.marginLeft,
 				marginRight: props.marginRight,
 				margin: props.margin,
+				color:
+					props.color === "error"
+						? "red"
+						: props.color === "warning"
+						? "orange"
+						: "black",
 				flex: props.stretch ? 1 : undefined,
 				border: props.border ? "1px solid black" : undefined,
 				borderLeft: props.borderLeft ? "1px solid black" : undefined,

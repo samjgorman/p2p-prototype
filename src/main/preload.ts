@@ -1,17 +1,10 @@
 import electron from "electron"
+import { Api } from "./api"
 
-const preloadApi = {
-	openExternalUrl(url: string) {
-		electron.shell.openExternal(url)
-	},
-	listIdentities(): Array<string> {
-		return []
-	},
-	createIdentity(name: string) {
-		return
-	},
-}
+export type PreloadApi = Api
 
-export type PreloadApi = typeof preloadApi
-
-window["preloadApi"] = preloadApi
+window["electron"] = electron
+window["preloadApi"] = new Proxy(
+	{},
+	{ get: (obj, prop) => electron.remote.app["api"][prop] }
+)

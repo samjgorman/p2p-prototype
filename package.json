@@ -8,7 +8,8 @@
 		"build": "tsc && webpack -p",
 		"watch": "webpack -w",
 		"start": "tsc -p tsconfig.main.json && electron build/main/main.js",
-		"test": "tsc -p tsconfig.test.json && ava build/test/**/*.js -v"
+		"test": "tsc -p tsconfig.test.json && ava build/test/**/*.js -v",
+		"postinstall": "electron-rebuild -o better-sqlite3"
 	},
 	"license": "MIT",
 	"dependencies": {
@@ -40,6 +41,7 @@
 		"ava": "^3.5.1",
 		"awesome-typescript-loader": "^5.2.1",
 		"electron": "^8.2.0",
+		"electron-rebuild": "^1.10.1",
 		"file-loader": "^6.0.0",
 		"html-webpack-plugin": "^4.0.3",
 		"inquirer": "^7.1.0",

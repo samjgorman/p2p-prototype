@@ -1,8 +1,14 @@
+SQLite is tricky
+- we have to figure out reactivity
+- we have to figure out streaming p2p
+- maybe its worth it to clean up the datalog stuff and jump right there?
+
+---
+
 Build a basic chat app with Electron
 Follow the mocks here:  https://whimsical.com/VPLPUCwCG9cwHuCkNyTQpo
 
 I think its time to dump this design file things and just build it...
--
 
 - keep mocking out https://whimsical.com/VPLPUCwCG9cwHuCkNyTQpo
 - abstraction for persisting data to disk.

@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Page, VStack, Heading, Input, Upload, FormActions } from "./ui"
+import { Page, VStack, Heading, Input, Upload, FormActions, Box } from "./ui"
 
 interface ImportIdentityProps {
 	onCancel?: () => void
@@ -21,6 +21,7 @@ export class ImportIdentity extends React.PureComponent<
 			<Page>
 				<VStack width="25em" gap={14}>
 					<Heading>Import Identity</Heading>
+					<Box color="warning">This doesnt work yet!</Box>
 					<Input
 						autoFocus={true}
 						value={this.state.name}

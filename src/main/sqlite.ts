@@ -5,45 +5,44 @@ const bootup = [
 	CREATE TABLE IF NOT EXISTS friends (
 		id TEXT PRIMARY KEY,
 		name TEXT NOT NULL,
-		password TEXT,
+		invite_code TEXT,
 		public_key TEXT
 	)
 	`,
 	`
 	CREATE TABLE IF NOT EXISTS messages (
 		id TEXT PRIMARY KEY,
-		chatroom_id TEXT NOT NULL, -- friend.id for now.
-		from_id TEXT NOT NULL,
-		to_id TEXT NOT NULL,
-		message TEXT NOT NULL
+		friend_id TEXT NOT NULL, -- friend.id for now.
+		incoming BOOLEAN NOT NULL,
+		message TEXT NOT NULL,
+		created_at TEXT NOT NULL
 	)
 	`,
 ]
 
-interface Friend {
+export interface Friend {
 	id: string
 	name: string
-	password?: string
+	invite_code?: string
 	public_key?: string
 }
 
-interface Message {
+export interface Message {
 	id: string
-	chatroom_id: string
-	from_id: string
-	to_id: string
+	friend_id: string
+	incoming: boolean
 	message: string
 	created_at: string // ISO UTC time.
 }
 
 interface Database {
 	createFriend(args: Friend): void
-	getFriend(id: string): Friend
+	getFriend(args: { id: string }): Friend
 	getFriends(): Array<Friend>
-	findPassword(password: string): Friend
+	findinvite_code(args: { invite_code: string }): Friend
 	savePublicKey(args: { id: string; public_key: string }): void
 	createMessage(args: Message): void
-	getMessages(chatroom_id: string): Array<Message>
+	getMessages(args: { friend_id: string }): Array<Message>
 }
 
 export function createSQLiteDatabase(dbPath: string): Database {
@@ -53,8 +52,8 @@ export function createSQLiteDatabase(dbPath: string): Database {
 	}
 
 	const createFriend = db.prepare(`
-		INSERT INTO friend (id, name, password, public_key)
-		VALUES ($id, $name, $password, $public_key)
+		INSERT INTO friend (id, name, invite_code, public_key)
+		VALUES ($id, $name, $invite_code, $public_key)
 	`)
 
 	const getFriend = db.prepare(`
@@ -66,9 +65,9 @@ export function createSQLiteDatabase(dbPath: string): Database {
 		SELECT * from friend
 	`)
 
-	const findPassword = db.prepare(`
+	const findinvite_code = db.prepare(`
 		SELECT * from friend
-		WHERE password = $password
+		WHERE invite_code = $invite_code
 	`)
 
 	const savePublicKey = db.prepare(`
@@ -78,13 +77,13 @@ export function createSQLiteDatabase(dbPath: string): Database {
 	`)
 
 	const createMessage = db.prepare(`
-		INSERT INTO message (id, chatroom_id, from_id, to_id, message, created_at)
-		VALUES ($id, $chatroom_id, $from_id, $to_id, $message, $created_at)
+		INSERT INTO message (id, friend_id, incoming, message, created_at)
+		VALUES ($id, $friend_id, $incoming, $message, $created_at)
 	`)
 
 	const getMessages = db.prepare(`
 		SELECT * FROM message
-		WHERE chatroom_id = $chatroom_id
+		WHERE friend_id = $friend_id
 		ORDER BY created_at DESC
 	`)
 
@@ -92,14 +91,14 @@ export function createSQLiteDatabase(dbPath: string): Database {
 		createFriend(args) {
 			createFriend.run(args)
 		},
-		getFriend(id: string) {
+		getFriend({ id }) {
 			return getFriend.get({ id })
 		},
 		getFriends() {
 			return getFriends.all()
 		},
-		findPassword(password) {
-			return findPassword.get({ password })
+		findinvite_code({ invite_code }) {
+			return findinvite_code.get({ invite_code })
 		},
 		savePublicKey({ id, public_key }) {
 			savePublicKey.run({ id, public_key })
@@ -107,8 +106,8 @@ export function createSQLiteDatabase(dbPath: string): Database {
 		createMessage(message) {
 			createMessage.run(message)
 		},
-		getMessages(chatroom_id) {
-			return getMessages.all({ chatroom_id })
+		getMessages({ friend_id }) {
+			return getMessages.all({ friend_id })
 		},
 	}
 }

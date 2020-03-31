@@ -1,26 +1,17 @@
 import * as React from "react"
-import { VStack, Select, SidebarItem, Box, Button } from "./ui"
+import { VStack, SidebarItem, Box, Button } from "./ui"
+import { Friend } from "../../main/sqlite"
 
 export interface SidebarProps {
-	me: string
-	identities: Array<string>
-	friends: Array<{ name: string; publicKey?: string }>
-	onChangeIdentity?: (identity: string) => void
+	friendId: string | undefined
+	friends: Array<Friend>
 }
 
 export class Sidebar extends React.PureComponent<SidebarProps> {
 	render() {
-		const { friends, me, identities } = this.props
+		const { friends } = this.props
 		return (
 			<VStack gap={8} width={300} height="100vh" borderRight={true}>
-				<Box padding={12}>
-					<Select
-						label="Identities"
-						value={me}
-						options={identities}
-						onChange={this.handleChangeIdentity}
-					/>
-				</Box>
 				<Box padding={12}>
 					<Box>Friends</Box>
 					{friends.map(friend => (
@@ -35,11 +26,5 @@ export class Sidebar extends React.PureComponent<SidebarProps> {
 				</Box>
 			</VStack>
 		)
-	}
-
-	handleChangeIdentity = (e: React.ChangeEvent<HTMLSelectElement>) => {
-		if (this.props.onChangeIdentity) {
-			this.props.onChangeIdentity(e.currentTarget.value)
-		}
 	}
 }

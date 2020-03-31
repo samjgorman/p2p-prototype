@@ -1,5 +1,6 @@
 import { app, BrowserWindow } from "electron"
 import * as path from "path"
+import "./api"
 
 function createWindow() {
 	// Create the browser window.
