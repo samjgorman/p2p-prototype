@@ -134,7 +134,6 @@ export function PlainButton(props: PlainButtonProps) {
 
 interface InputProps extends BoxProps {
 	label: React.ReactNode
-	width?: number | string
 	value?: string
 	onChange?: React.ChangeEventHandler<HTMLInputElement>
 }
@@ -142,11 +141,7 @@ export function Input(props: InputProps) {
 	return (
 		<VStack {...props} element="label">
 			<Box>{props.label}</Box>
-			<input
-				value={props.value}
-				onChange={props.onChange}
-				style={{ width: props.width }}
-			/>
+			<input value={props.value} onChange={props.onChange} />
 		</VStack>
 	)
 }
@@ -191,7 +186,7 @@ export function Page({ children }: PageProps) {
 	return (
 		<VStack align="center">
 			<Box height={100} />
-			<Box maxWidth={600}>
+			<Box width="100%" maxWidth={600}>
 				<HStack>
 					<Box width={12} />
 					<VStack gap={8} stretch>
@@ -205,19 +200,6 @@ export function Page({ children }: PageProps) {
 	)
 }
 
-export function Welcome(props: {
-	onNewIdentity?: () => void
-	onImportIdentity?: () => void
-}) {
-	return (
-		<Page>
-			<Heading>Welcome to P2P Chat</Heading>
-			<Button onClick={props.onNewIdentity}>Create a new identity</Button>
-			<Button onClick={props.onImportIdentity}>Import identity</Button>
-		</Page>
-	)
-}
-
 interface FormActionsProps {
 	onSubmit?: () => void
 	onCancel?: () => void
@@ -228,61 +210,6 @@ export function FormActions(props: FormActionsProps) {
 			<Button onClick={props.onSubmit}>Submit</Button>
 			<PlainButton onClick={props.onCancel}>Cancel</PlainButton>
 		</HStack>
-	)
-}
-
-interface NewIdentityProps {
-	onCancel?: () => void
-	onSubmit?: (name: string) => void
-}
-interface NewIdentityState {
-	name: string
-}
-export class NewIdentity extends React.PureComponent<
-	NewIdentityProps,
-	NewIdentityState
-> {
-	state: NewIdentityState = { name: "" }
-
-	render() {
-		return (
-			<Page>
-				<Heading>New Identity</Heading>
-				<Input
-					value={this.state.name}
-					onChange={this.handleChangeName}
-					label="Name"
-					width="25em"
-				/>
-				<FormActions
-					onCancel={this.props.onCancel}
-					onSubmit={this.handleSubmit}
-				/>
-			</Page>
-		)
-	}
-
-	private handleChangeName = (e: React.ChangeEvent<HTMLInputElement>) => {
-		this.setState({ name: e.currentTarget.value })
-	}
-
-	private handleSubmit = () => {
-		if (this.props.onSubmit) {
-			this.props.onSubmit(this.state.name)
-		}
-	}
-}
-
-export function ImportIdentity() {
-	return (
-		<Page>
-			<VStack width="25em" gap={14}>
-				<Heading>Import Identity</Heading>
-				<Input label="Name" />
-				<Upload label="Archive" />
-				<FormActions />
-			</VStack>
-		</Page>
 	)
 }
 

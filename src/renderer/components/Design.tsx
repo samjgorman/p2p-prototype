@@ -1,5 +1,7 @@
 import * as React from "react"
-import { Welcome, NewIdentity, ImportIdentity } from "./ui"
+import { ImportIdentity } from "./ImportIdentity"
+import { NewIdentity } from "./NewIdentity"
+import { Welcome } from "./Welcome"
 
 interface PlaygroundProps {}
 
@@ -31,7 +33,12 @@ export class Design extends React.PureComponent<
 				/>
 			)
 		} else if (this.state.page === "ImportIdentity") {
-			return <ImportIdentity />
+			return (
+				<ImportIdentity
+					onCancel={() => this.setState({ page: "Welcome" })}
+					onSubmit={() => this.setState({ page: "Welcome" })}
+				/>
+			)
 		}
 	}
 }
