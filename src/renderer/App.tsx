@@ -1,3 +1,4 @@
+import "./app.css"
 import * as React from "react"
 import { Router } from "./components/Router"
 import { Root } from "./components/Root"
@@ -13,7 +14,7 @@ export function App() {
 					// return <Root navigate={navigate} />
 				}
 				if (route.type === "welcome") {
-					return <Welcome navigate={navigate} />
+					return <Welcome />
 				}
 				if (route.type === "chat") {
 					return <div>TBD</div>

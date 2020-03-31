@@ -72,12 +72,26 @@ export function HStack(props: HStackProps) {
 
 interface BoxProps {
 	element?: "div" | "label"
+
 	height?: string | number
 	width?: string | number
 	maxHeight?: string | number
 	maxWidth?: string | number
 	minHeight?: string | number
 	minWidth?: string | number
+
+	padding?: string | number
+	paddingTop?: string | number
+	paddingBottom?: string | number
+	paddingLeft?: string | number
+	paddingRight?: string | number
+
+	margin?: string | number
+	marginTop?: string | number
+	marginBottom?: string | number
+	marginLeft?: string | number
+	marginRight?: string | number
+
 	stretch?: boolean
 	border?: boolean
 	scroll?: boolean
@@ -86,25 +100,46 @@ interface BoxProps {
 }
 export function Box(props: BoxProps) {
 	const Elm = props.element || "div"
+
 	return (
 		<Elm
-			style={{
+			style={removeUndefinedValues({
 				height: props.height,
 				width: props.width,
 				maxHeight: props.maxHeight,
 				maxWidth: props.maxWidth,
 				minHeight: props.minHeight,
 				minWidth: props.minWidth,
+				paddingTop: props.paddingTop,
+				paddingBottom: props.paddingBottom,
+				paddingLeft: props.paddingLeft,
+				paddingRight: props.paddingRight,
+				padding: props.padding,
+				marginTop: props.marginTop,
+				marginBottom: props.marginBottom,
+				marginLeft: props.marginLeft,
+				marginRight: props.marginRight,
+				margin: props.margin,
 				flex: props.stretch ? 1 : undefined,
 				border: props.border ? "1px solid black" : undefined,
 				overflow: props.scroll ? "auto" : undefined,
 				...props.style,
-			}}
+			})}
 		>
 			{props.children}
 		</Elm>
 	)
 }
+
+function removeUndefinedValues(obj: object) {
+	for (const key in obj) {
+		if (obj[key] === undefined) {
+			delete obj[key]
+		}
+	}
+	return obj
+}
+
 interface HeadingProps {
 	children: React.ReactNode
 }
@@ -172,7 +207,9 @@ export function Select(props: SelectProps) {
 			<Box>{props.label}</Box>
 			<select value={props.value} onChange={props.onChange}>
 				{props.options?.map(option => (
-					<option value={option} />
+					<option key={option} value={option}>
+						{option}
+					</option>
 				))}
 			</select>
 		</VStack>
@@ -184,18 +221,14 @@ interface PageProps {
 }
 export function Page({ children }: PageProps) {
 	return (
-		<VStack align="center">
-			<Box height={100} />
+		<VStack align="center" paddingTop={100} paddingBottom={100}>
 			<Box width="100%" maxWidth={600}>
-				<HStack>
-					<Box width={12} />
+				<HStack paddingLeft={12} paddingRight={12}>
 					<VStack gap={8} stretch>
 						{children}
 					</VStack>
-					<Box width={12} />
 				</HStack>
 			</Box>
-			<Box height={100} />
 		</VStack>
 	)
 }
@@ -219,51 +252,6 @@ interface SidebarItemProps {
 }
 export function SidebarItem({ selected, children }: SidebarItemProps) {
 	return <Button>{children}</Button>
-}
-
-interface SidebarProps {
-	me: string
-	identities: Array<string>
-	friends: Array<string>
-}
-export function Sidebar({ friends, me, identities }: SidebarProps) {
-	return (
-		<VStack gap={8} width={300}>
-			<Select label="Identities" value={me} options={identities} />
-			{friends.map(friend => (
-				<SidebarItem selected={false}>{friend}</SidebarItem>
-			))}
-			<Box stretch={true} />
-			<Button>Add Friend</Button>
-		</VStack>
-	)
-}
-
-interface ChatLayoutProps extends SidebarProps {
-	children?: React.ReactNode
-}
-export function ChatLayout({
-	me,
-	friends,
-	children,
-	identities,
-}: ChatLayoutProps) {
-	return (
-		<HStack>
-			<Sidebar me={me} friends={friends} identities={identities} />
-			<Box stretch={true}>{children}</Box>
-		</HStack>
-	)
-}
-
-export function EmptyChatForm() {
-	return (
-		<VStack align="center">
-			<Box height={200} />
-			<Heading>Invite a friend to chat with!</Heading>
-			<Button>Add Friend</Button>
-		</VStack>
-	)
 }
 
 export function AddFriendForm() {
@@ -294,8 +282,7 @@ interface ModalMenuProps {
 export function ModalMenu({ width, children }: ModalMenuProps) {
 	return (
 		<Modal>
-			<VStack align="center">
-				<Box height={250} />
+			<VStack align="center" paddingTop={250}>
 				<Box width={width} border={true}>
 					{children}
 				</Box>
@@ -317,8 +304,7 @@ interface PendingInviteFormProps {
 }
 export function PendingInviteForm({ friend }: PendingInviteFormProps) {
 	return (
-		<VStack gap={30} align="center">
-			<Box height={300} />
+		<VStack gap={30} align="center" paddingTop={200}>
 			<Input label={`Send ${friend} your invite code:`} />
 			<Box>Or</Box>
 			<Input label={`Paste ${friend}'s invite code:`} />

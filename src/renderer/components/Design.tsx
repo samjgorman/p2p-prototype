@@ -2,20 +2,19 @@ import * as React from "react"
 import { ImportIdentity } from "./ImportIdentity"
 import { NewIdentity } from "./NewIdentity"
 import { Welcome } from "./Welcome"
+import { ChatApp } from "./ChatApp"
 
 interface PlaygroundProps {}
 
-const pages = { Welcome, NewIdentity, ImportIdentity }
-
 interface PlaygroundState {
-	page: keyof typeof pages
+	page: "Welcome" | "NewIdentity" | "ImportIdentity" | "ChatApp"
 }
 
 export class Design extends React.PureComponent<
 	PlaygroundProps,
 	PlaygroundState
 > {
-	state: PlaygroundState = { page: "Welcome" }
+	state: PlaygroundState = { page: "ChatApp" }
 
 	render() {
 		if (this.state.page === "Welcome") {
@@ -39,6 +38,8 @@ export class Design extends React.PureComponent<
 					onSubmit={() => this.setState({ page: "Welcome" })}
 				/>
 			)
+		} else if (this.state.page === "ChatApp") {
+			return <ChatApp me="Chet" friends={[]} identities={["Chet"]} />
 		}
 	}
 }

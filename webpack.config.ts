@@ -1,6 +1,7 @@
 import * as path from "path"
-import HtmlWebpackPlugin from "html-webpack-plugin"
 import { Configuration } from "webpack"
+import HtmlWebpackPlugin from "html-webpack-plugin"
+import MiniCssExtractPlugin from "mini-css-extract-plugin"
 
 const config: Configuration = {
 	mode: "development",
@@ -15,6 +16,10 @@ const config: Configuration = {
 				exclude: /node_modules/,
 				use: [{ loader: "awesome-typescript-loader" }],
 			},
+			{
+				test: /\.css$/i,
+				use: [MiniCssExtractPlugin.loader, "css-loader"],
+			},
 		],
 	},
 	cache: true,
@@ -25,6 +30,7 @@ const config: Configuration = {
 		chunkFilename: "[name].js",
 	},
 	plugins: [
+		new MiniCssExtractPlugin(),
 		new HtmlWebpackPlugin({
 			template: path.join(__dirname, "src/renderer/index.html"),
 		}),
