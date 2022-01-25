@@ -11,3 +11,10 @@
 
 WebRTC says it can set up a secure channel, but is vulnerable to MITM if the discovery channel is insecure. I'm assuming that encrypting the signaling packets should solve that issue.
 
+### [WIP] Set up guide:
+
+1. Run node app.js in the build directory to open a peer connection.
+2. Open another peer connection with node app.js on another process or machine.
+3. Exchange secure hashes as prompted to instantiate a connection and begin talking.
+
+
