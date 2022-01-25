@@ -88,9 +88,12 @@ async function main() {
 	])
 
 	const hub = signalhub("chets-p2p-prototype", [
-		"https://signalhub-jccqtwhdwc.now.sh",
-		// "https://signalhub-hzbibrznqa.now.sh",
+		"https://evening-brook-96941.herokuapp.com/", //This is a free Heroku instance I've spun up just for us.
+		"https://signalhub.herokuapp.com/"  //This is a backup public free Heroku instance.
+
+	
 	])
+
 
 	if (action === "sendInvite") {
 		const { name } = await inquirer.prompt([
@@ -110,6 +113,7 @@ async function main() {
 
 		const publicKey = await new Promise<Buffer>(resolve => {
 			const stream = hub.subscribe(getPublicKeyId(me.publicKey))
+
 			stream.on("data", (message: PublicChannelMessage) => {
 				if (message.type === "seal") {
 					const data = sealOpen({
@@ -155,7 +159,9 @@ async function main() {
 		await fs.writeJSON(friendsPath, friends)
 
 		// Listen for webrtc connection now.
-		action = "connectFromSomeone"
+		// action = "connectFromSomeone"
+		action = "connectToSomeone"
+
 	}
 
 	if (action === "acceptInvite") {
@@ -228,7 +234,9 @@ async function main() {
 		await fs.writeJSON(friendsPath, friends)
 
 		// Try to connect via simple-peer
-		action = "connectToSomeone"
+		// action = "connectToSomeone"
+		action = "connectFromSomeone"
+
 	}
 
 	function connect(name: string, initiator: boolean) {
@@ -268,20 +276,26 @@ async function main() {
 					to: me,
 				}).toString("utf8")
 			)
+
+
 			if (result.type !== "signal") {
 				console.log("wrong payload type")
 				return
 			}
+
+
 			peer.signal(result.data)
 			stream.destroy()
 		})
 
 		peer.on("connect", async () => {
-			console.log("Connected!")
+			console.log("Connected!") //Not reachable 
 			while (true) {
 				const { message } = await inquirer.prompt([
 					{ type: "input", name: "message", message: "me>" },
 				])
+				// console.log('This is the sent message:  ' + message); //Sam
+
 				peer.send(message)
 			}
 		})
