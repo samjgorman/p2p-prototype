@@ -159,7 +159,7 @@ async function main() {
 		await fs.writeJSON(friendsPath, friends)
 
 		// Listen for webrtc connection now.
-		// action = "connectFromSomeone"
+		// action = "connectFromSomeone" //Commented out because initiator must be set to true when first connecting
 		action = "connectToSomeone"
 
 	}
@@ -234,7 +234,7 @@ async function main() {
 		await fs.writeJSON(friendsPath, friends)
 
 		// Try to connect via simple-peer
-		// action = "connectToSomeone"
+		// action = "connectToSomeone" //Commented out because initiator must be set to true when first connecting
 		action = "connectFromSomeone"
 
 	}
@@ -289,12 +289,11 @@ async function main() {
 		})
 
 		peer.on("connect", async () => {
-			console.log("Connected!") //Not reachable 
+			console.log("Connected!") 
 			while (true) {
 				const { message } = await inquirer.prompt([
 					{ type: "input", name: "message", message: "me>" },
 				])
-				// console.log('This is the sent message:  ' + message); //Sam
 
 				peer.send(message)
 			}
