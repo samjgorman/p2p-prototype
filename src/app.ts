@@ -14,6 +14,7 @@ import inquirer from "inquirer"
 import signalhub from "signalhub"
 import Peer from "simple-peer"
 import wrtc from "wrtc"
+import { Timer } from "./util"
 
 function getPublicKeyId(publicKey: Buffer) {
 	return createHash(publicKey).toString("base64")
@@ -41,6 +42,8 @@ type PeerSignal = {
 }
 
 async function main() {
+	const timer = new Timer() //For network timeouts
+
 	const { identity } = await inquirer.prompt([
 		{
 			type: "input",
@@ -89,11 +92,8 @@ async function main() {
 
 	const hub = signalhub("chets-p2p-prototype", [
 		"https://evening-brook-96941.herokuapp.com/", //This is a free Heroku instance I've spun up just for us.
-		"https://signalhub.herokuapp.com/"  //This is a backup public free Heroku instance.
-
-	
+		"https://signalhub.herokuapp.com/", //This is a backup public free Heroku instance.
 	])
-
 
 	if (action === "sendInvite") {
 		const { name } = await inquirer.prompt([
@@ -111,7 +111,7 @@ async function main() {
 		console.log(`Send this payload to ${name}:`)
 		console.log(invite)
 
-		const publicKey = await new Promise<Buffer>(resolve => {
+		const publicKey = await new Promise<Buffer>((resolve) => {
 			const stream = hub.subscribe(getPublicKeyId(me.publicKey))
 
 			stream.on("data", (message: PublicChannelMessage) => {
@@ -161,7 +161,6 @@ async function main() {
 		// Listen for webrtc connection now.
 		// action = "connectFromSomeone" //Commented out because initiator must be set to true when first connecting
 		action = "connectToSomeone"
-
 	}
 
 	if (action === "acceptInvite") {
@@ -202,7 +201,7 @@ async function main() {
 		console.log("Sending invite response to", name)
 		hub.broadcast(getPublicKeyId(publicKey), channelMessage)
 
-		await new Promise<void>(resolve => {
+		await new Promise<void>((resolve) => {
 			const stream = hub.subscribe(getPublicKeyId(me.publicKey))
 			stream.on("data", (message: PublicChannelMessage) => {
 				if (message.type === "box") {
@@ -236,13 +235,12 @@ async function main() {
 		// Try to connect via simple-peer
 		// action = "connectToSomeone" //Commented out because initiator must be set to true when first connecting
 		action = "connectFromSomeone"
-
 	}
 
 	function connect(name: string, initiator: boolean) {
 		const publicKey = Buffer.from(friends[name], "base64")
 		const peer = new Peer({ initiator, wrtc: wrtc })
-		peer.on("signal", function(data) {
+		peer.on("signal", function (data) {
 			const payload: PeerSignal = {
 				type: "signal",
 				data: data,
@@ -277,19 +275,29 @@ async function main() {
 				}).toString("utf8")
 			)
 
-
 			if (result.type !== "signal") {
 				console.log("wrong payload type")
 				return
 			}
 
-
 			peer.signal(result.data)
 			stream.destroy()
 		})
 
+		var start = false
+
+		let myTimeout = setTimeout(() => {
+			if (start == false) {
+				console.log("The connection expired")
+			}
+		}, 5000)
+
 		peer.on("connect", async () => {
-			console.log("Connected!") 
+			console.log("Connected!")
+			start = true
+			clearTimeout(myTimeout)
+
+			//A chat session begins
 			while (true) {
 				const { message } = await inquirer.prompt([
 					{ type: "input", name: "message", message: "me>" },
@@ -298,13 +306,15 @@ async function main() {
 				peer.send(message)
 			}
 		})
-		peer.on("data", data => {
+
+		//Received new message from sending peer
+		peer.on("data", (data) => {
 			console.log(name + ">", data.toString("utf8"))
 		})
 		peer.on("close", () => {
 			console.log("close")
 		})
-		peer.on("error", error => {
+		peer.on("error", (error) => {
 			console.log("error", error)
 		})
 		peer.on("end", () => {

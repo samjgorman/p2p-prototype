@@ -1,45 +1,57 @@
 {
-	"name": "p2p-sync-prototype",
-	"version": "1.0.0",
-	"description": "P2P sync prototype",
-	"keywords": [],
-	"author": "",
-	"scripts": {
-		"build": "tsc",
-		"watch": "tsc --watch",
-		"test": "tsc && ava build/test/**/*.js -v"
-	},
-	"license": "MIT",
-	"dependencies": {
-		"@hyperswarm/discovery": "^1.10.0",
-		"@hyperswarm/network": "^1.2.0",
-		"@types/blessed": "^0.1.17",
-		"@types/express": "^4.17.3",
-		"@types/fs-extra": "^8.1.0",
-		"@types/inquirer": "^6.5.0",
-		"@types/node": "^13.9.1",
-		"@types/react": "^16.9.23",
-		"@types/react-blessed": "^0.3.2",
-		"@types/simple-peer": "^9.6.0",
-		"@types/sodium-native": "^2.3.4",
-		"ava": "^3.15.0",
-		"blessed": "^0.1.81",
-		"body-parser": "^1.19.0",
-		"express": "^4.17.1",
-		"fs-extra": "^8.1.0",
-		"inquirer": "^7.1.0",
-		"lodash": "^4.17.15",
-		"react": "^16.13.0",
-		"react-blessed": "^0.6.2",
-		"signalhub": "^4.9.0",
-		"simple-peer": "^9.6.2",
-		"sodium-native": "^3.0.0",
-		"wrtc": "^0.4.4",
-		"yargs": "^15.3.1"
-	},
-	"devDependencies": {
-		"@types/lodash": "^4.14.149",
-		"ts-node": "^8.6.2",
-		"typescript": "^3.9.10"
-	}
+  "name": "p2p-sync-prototype",
+  "version": "1.0.0",
+  "description": "P2P sync prototype",
+  "keywords": [],
+  "author": "",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "test": "tsc && ava build/test/**/*.js -v"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@hyperswarm/discovery": "^1.10.0",
+    "@hyperswarm/network": "^1.2.0",
+    "@types/blessed": "^0.1.17",
+    "@types/express": "^4.17.3",
+    "@types/fs-extra": "^8.1.0",
+    "@types/inquirer": "^6.5.0",
+    "@types/react": "^16.9.23",
+    "@types/react-blessed": "^0.3.2",
+    "@types/simple-peer": "^9.6.0",
+    "@types/sodium-native": "^2.3.4",
+    "ava": "^3.15.0",
+    "blessed": "^0.1.81",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "fs-extra": "^8.1.0",
+    "inquirer": "^7.1.0",
+    "lodash": "^4.17.15",
+    "react": "^16.13.0",
+    "react-blessed": "^0.6.2",
+    "signalhub": "^4.9.0",
+    "simple-peer": "^9.6.2",
+    "sodium-native": "^3.0.0",
+    "wrtc": "^0.4.4",
+    "yargs": "^15.3.1"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.149",
+    "@types/node": "^13.13.52",
+    "ts-node": "^8.6.2",
+    "typescript": "^3.9.10"
+  },
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/samjgorman/p2p-prototype.git"
+  },
+  "bugs": {
+    "url": "https://github.com/samjgorman/p2p-prototype/issues"
+  },
+  "homepage": "https://github.com/samjgorman/p2p-prototype#readme"
 }
