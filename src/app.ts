@@ -14,7 +14,7 @@ import inquirer from "inquirer"
 import signalhub from "signalhub"
 import Peer from "simple-peer"
 import wrtc from "wrtc"
-import { Timer } from "./util"
+// import { Timer } from "./util"
 
 function getPublicKeyId(publicKey: Buffer) {
 	return createHash(publicKey).toString("base64")
@@ -34,6 +34,7 @@ type InviteResponseMessage = {
 	password: string
 	publicKey: string
 }
+
 type InviteAckMessage = { type: "invite-ack" }
 
 type PeerSignal = {
@@ -42,7 +43,7 @@ type PeerSignal = {
 }
 
 async function main() {
-	const timer = new Timer() //For network timeouts
+	// const timer = new Timer() //For network timeouts
 
 	const { identity } = await inquirer.prompt([
 		{
@@ -237,7 +238,65 @@ async function main() {
 		action = "connectFromSomeone"
 	}
 
-	function connect(name: string, initiator: boolean) {
+	//  This util appends to a file
+	async function writeToFS(fileNamePath: string, message: string) {
+		if (message.length > 0) {
+			fs.appendFile(fileNamePath, message + "\n", (err) => {
+				if (err) {
+					console.log("Error appending to file" + err)
+				}
+				// } else {
+				//   // Get the file contents after the append operation
+				//   console.log(
+				//     '\nFile Contents of file after append:',
+				//     fs.readFileSync('test.txt', 'utf8')
+				//   )
+				// }
+			})
+		}
+	}
+
+	async function buildChatDir(identity: string, name: string): Promise<string> {
+		const dirName = identity + "_" + name
+		const chatPath = path.join(__dirname, "..", "chats", dirName)
+		await fs.mkdirp(chatPath)
+
+		// const fileName =
+		// 	identity + "_" + name + "_" + Date.now().toString() + ".json"
+		const fileName = identity + "_" + name + "_" + ".json"
+
+		const chatSessionPath = path.join(chatPath, fileName)
+
+		if (!(await fs.pathExists(chatSessionPath))) {
+			//check if opposite path exists too
+			console.log("Generating unique chat file.")
+			const first_val = JSON.stringify({ "Hello!": "Hi" })
+			await fs.writeFile(chatSessionPath, first_val) //Start with public key?
+		}
+
+		return chatSessionPath
+	}
+
+	function formatMessageToStringifiedLog(
+		identity: string,
+		message: string
+	): string {
+		const log = {
+			timestamp: Date.now(),
+			sender: identity,
+			message: message, //Check this
+		}
+		const stringified_log = JSON.stringify(log)
+		return stringified_log
+	}
+	/**
+	 * Connect
+	 * @param identity  -> String identity of the sender of the message
+	 * @param name  -> String Name of the recipient of the message
+	 * @param initiator -> Bool representing if initiator of the wrtc connection
+	 */
+	function connect(identity: string, name: string, initiator: boolean) {
+		//now async
 		const publicKey = Buffer.from(friends[name], "base64")
 		const peer = new Peer({ initiator, wrtc: wrtc })
 		peer.on("signal", function (data) {
@@ -284,18 +343,8 @@ async function main() {
 			stream.destroy()
 		})
 
-		var start = false
-
-		let myTimeout = setTimeout(() => {
-			if (start == false) {
-				console.log("The connection expired")
-			}
-		}, 5000)
-
 		peer.on("connect", async () => {
 			console.log("Connected!")
-			start = true
-			clearTimeout(myTimeout)
 
 			//A chat session begins
 			while (true) {
@@ -303,13 +352,21 @@ async function main() {
 					{ type: "input", name: "message", message: "me>" },
 				])
 
+				const log = formatMessageToStringifiedLog(identity, message.message) //Check this
+				const chatSessionPath = await buildChatDir(identity, name)
+				writeToFS(chatSessionPath, log)
 				peer.send(message)
+				//Send a peer a message, write this message to the local fs
 			}
 		})
 
 		//Received new message from sending peer
-		peer.on("data", (data) => {
+		peer.on("data", async (data) => {
 			console.log(name + ">", data.toString("utf8"))
+			//Received message from peer, write this to the local fs
+			const log = formatMessageToStringifiedLog(identity, data.toString("utf8")) //Check this
+			const chatSessionPath = await buildChatDir(identity, name)
+			writeToFS(chatSessionPath, log)
 		})
 		peer.on("close", () => {
 			console.log("close")
@@ -331,7 +388,7 @@ async function main() {
 				choices: Object.keys(friends),
 			},
 		])
-		connect(name, true)
+		connect(identity, name, true)
 	}
 
 	if (action === "connectFromSomeone") {
@@ -344,7 +401,7 @@ async function main() {
 				choices: Object.keys(friends),
 			},
 		])
-		connect(name, false)
+		connect(identity, name, false)
 	}
 }
 

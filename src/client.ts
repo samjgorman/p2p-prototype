@@ -14,7 +14,7 @@ const fileName = port + ".log"
 
 function handleSocket(socket: net.Socket) {
 	socket.write(JSON.stringify({ size: log.length }))
-	socket.on("data", async function(data) {
+	socket.on("data", async function (data) {
 		const body = JSON.parse(data.toString("utf8"))
 
 		log.push(...body.values)
@@ -23,16 +23,16 @@ function handleSocket(socket: net.Socket) {
 			for (const item of body.values) {
 				console.log(">", item)
 			}
-			await new Promise(resolve =>
+			await new Promise((resolve) =>
 				fs.appendFile(fileName, body.values.join("\n") + "\n", resolve)
 			)
 		}
 	})
 
-	socket.on("close", function() {
+	socket.on("close", function () {
 		socket.destroy()
 	})
-	socket.on("error", function() {
+	socket.on("error", function () {
 		socket.destroy()
 	})
 }

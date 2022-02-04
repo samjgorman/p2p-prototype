@@ -16,7 +16,7 @@ const rl = readline.createInterface({
 })
 
 async function getItem() {
-	return new Promise<string>(resolve => {
+	return new Promise<string>((resolve) => {
 		rl.question("> ", resolve)
 	})
 }
@@ -27,7 +27,7 @@ const clients = new Set<net.Socket>()
 
 function handleSocket(socket: net.Socket) {
 	clients.add(socket)
-	socket.on("data", data => {
+	socket.on("data", (data) => {
 		const body = JSON.parse(data.toString("utf8"))
 		if (body.size < log.length) {
 			socket.write(JSON.stringify({ values: log.slice(body.size) }))
@@ -49,7 +49,7 @@ async function main() {
 	// Become discoverable to clients.
 	const server = serve(port, handleSocket)
 	// Connect to known clients.
-	const brokers = remotePorts.map(remotePort =>
+	const brokers = remotePorts.map((remotePort) =>
 		connect(remotePort, handleSocket)
 	)
 
@@ -59,7 +59,9 @@ async function main() {
 			continue
 		}
 		log.push(item)
-		await new Promise(resolve => fs.appendFile(fileName, item + "\n", resolve))
+		await new Promise((resolve) =>
+			fs.appendFile(fileName, item + "\n", resolve)
+		)
 		for (const client of clients) {
 			client.write(JSON.stringify({ values: [item] }))
 		}
