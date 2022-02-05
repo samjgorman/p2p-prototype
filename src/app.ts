@@ -267,11 +267,20 @@ async function main() {
 
 		const chatSessionPath = path.join(chatPath, fileName)
 
+		//If file has not already been created, create it
 		if (!(await fs.pathExists(chatSessionPath))) {
 			//check if opposite path exists too
 			console.log("Generating unique chat file.")
 			const first_val = JSON.stringify({ "Hello!": "Hi" })
-			await fs.writeFile(chatSessionPath, first_val) //Start with public key?
+
+			fs.open(chatSessionPath, "wx", function (err, fd) {
+				//Wx flag creates empty file async
+				// handle error
+				fs.close(fd, function (err) {
+					// handle error and close fd
+				})
+			})
+			// await fs.writeFile(chatSessionPath, first_val) //Start with public key?
 		}
 
 		return chatSessionPath
@@ -351,8 +360,12 @@ async function main() {
 				const { message } = await inquirer.prompt([
 					{ type: "input", name: "message", message: "me>" },
 				])
+				console.log("this is message")
+				console.log(message)
+				console.log("this is message.name")
+				console.log(message.name)
 
-				const log = formatMessageToStringifiedLog(identity, message.message) //Check this
+				const log = formatMessageToStringifiedLog(identity, message) //Check this
 				const chatSessionPath = await buildChatDir(identity, name)
 				writeToFS(chatSessionPath, log)
 				peer.send(message)
